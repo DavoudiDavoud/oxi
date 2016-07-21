@@ -1,0 +1,41 @@
+#include "led.h"
+
+#include<qfont.h>
+#include<stdio.h>
+
+
+Led::Led(int nLeds) : QComboBox() {
+
+	numberOfLeds = nLeds;
+
+	setMinimumWidth ( fontMetrics().width("x50XX") );
+
+	for(int i=0;i<nLeds;i++) {
+		char tmp[10];
+		sprintf(tmp,"%02d",i);
+		addItem(tr(tmp),i);
+	}
+	addItem(tr("off"),nLeds);
+		
+	connect(this,
+		SIGNAL( activated(int) ),
+		this,
+		SLOT( LedChanged(int) ) );
+
+}
+
+void Led::ledChanged ( int index ) {
+ 	channel = itemData(index).toInt();
+}
+
+void Led::setLed( int c ) {
+	if ((c >= 0)&&(c<numberOfLeds)) {
+		// proper channel number
+		setCurrentIndex( c );
+		channel = c;
+	} else {
+		// channel off
+		setCurrentIndex( numberOfLeds );
+		led = numberOfLeds;
+	}
+}

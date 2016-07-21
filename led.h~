@@ -1,0 +1,32 @@
+#ifndef _LED
+#define _LED
+
+#include <QComboBox>
+
+class Led : public QComboBox {
+
+    Q_OBJECT
+
+public:
+    /**
+     * constructor
+     **/
+	Led(int nLeds);
+
+private slots:
+	void ledChanged(int i);
+	
+private:
+	int led;
+	int numberOfLeds;
+	
+public:
+	inline float getLed() {return led;};
+
+	void setLed(int Led);
+
+	inline int isActive() {return led != numberOfLeds;};
+
+};
+
+#endif
