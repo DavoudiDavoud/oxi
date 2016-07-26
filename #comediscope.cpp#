@@ -646,7 +646,7 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 	    if (comediRecord->recPushButton->checkState()==Qt::Checked) {
 	      writeFile();
 	    }
-	    if (count==2*8000){
+	    if (count== 800){
 	      count =0;
 	      static int diout = 0;
 	      switch (diout){
@@ -695,9 +695,10 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 	    }
 	  }
 	  else {
-	    if (comediRecord->recPushButton->checkState()==Qt::Checked) {
+	    // save data
+	    /* if (comediRecord->recPushButton->checkState()==Qt::Checked) {
 	      writeFile();
-	    }
+	      }*/
 	    
 	  }
 	  nsamples++;
