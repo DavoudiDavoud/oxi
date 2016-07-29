@@ -279,7 +279,20 @@ ComediRecord::ComediRecord( QWidget *parent,
 	QGroupBox *restGroup = new QGroupBox;
 
 
-	
+
+	//exp stuff
+	expLabel = new QLabel(this);
+	expLabel->setText("Experiment mode:");
+	expgrp = new QGroupBox;
+	expgrp->setStyleSheet(styleSheet);
+	expbox = new QHBoxLayout();
+	expgrp->setLayout(expbox);
+	expbox->addWidget(expLabel);
+	expbox->setSpacing(1);
+	exp = new Exp();
+	exp->setStyleSheet(styleSheet);
+	expbox->addWidget(exp);	
+	restLayout->addWidget(expgrp);	
 
 	//axis stuff
 	axisLabel = new QLabel(this);

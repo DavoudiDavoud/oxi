@@ -201,7 +201,10 @@ ComediScope::ComediScope( ComediRecord *comediRecordTmp,
 
 	xpos=0;
 	nsamples=0;
-
+	exp_index = 0;
+	led_index = 0;
+	count = 0;
+	dch = 2;
 	maxdata = new lsampl_t[nComediDevices];
 	assert( maxdata != NULL );
 	crange = new comedi_range*[nComediDevices];
@@ -346,12 +349,17 @@ void ComediScope::setFilename(QString name,int csv) {
 
 void ComediScope::writeFile() {
 	if (!rec_file) return;
-	if (comediRecord->
-	    rawCheckbox->isChecked()) {
-		fprintf(rec_file,"%ld",nsamples);
-	} else {
-		fprintf(rec_file,"%f",((float)nsamples)/((float)sampling_rate));
+	/*if (comediRecord-> rawCheckbox->isChecked()) {
+	  fprintf(rec_file,"%ld",nsamsples);
+	  } else {
+	  fprintf(rec_file,"%f",((float)nsamples)/((float)sampling_rate));
+	  }*/
+	//static int exp_index = 0;
+	fprintf(rec_file,"%ld",nsamples);
+	if (comediRecord->exp->hasChanged() != 0 ) {
+	  exp_index = comediRecord->exp->getExp();
 	}
+	
 	for(int n=0;n<nComediDevices;n++) {
 		for(int i=0;i<channels_in_use;i++) {
 			if (comediRecord->
@@ -360,12 +368,12 @@ void ComediScope::writeFile() {
 				if (comediRecord->
 				    rawCheckbox->isChecked()) {
 					fprintf(rec_file,
-						"%c%d",separator,(int)(daqData[n][i]));
+						"%c%d%c%d%c%ld%c%d%c%d",separator,(int)(daqData[n][i]),separator,dch,separator,count,separator,led_index,separator,exp_index);
 				} else {
 					float phy=comedi_to_phys((lsampl_t)(daqData[n][i]),
 								 crange[n],
 								 maxdata[n]);
-					fprintf(rec_file,"%c%f",separator,phy);
+					fprintf(rec_file,"%c%f%c%d%c%ld%c%d%c%d",separator,phy,separator,dch,separator,count,separator,led_index,separator,exp_index);
 				}
 			}
 		}
@@ -523,8 +531,8 @@ void ComediScope::paintData(float** buffer) {
 
 void ComediScope::paintEvent( QPaintEvent * ) {
         int ret;
-	static int count = 0;
-	static int led_mod= 0;
+	//static int count = 0;
+	//static int led_mod= 0;
 	static unsigned char fake_buffer[10000];
 
 	
@@ -588,10 +596,9 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 	    }
 	  }
 	  if (comediRecord->led->hasChanged() != 0 ) {
-	    int led = comediRecord->led->getLed();
+	    led_index = comediRecord->led->getLed();
 	    count = 0;
-	    led_mod = led;
-	    switch (led){
+	    switch (led_index){
 	    case 0:
 	      //printf("led:%d\n\n\n\n",led_mod);
 	      for (int dout =0; dout<2;dout++){
@@ -601,8 +608,10 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 		  exit(-1);
 		}
 	      }
+	      dch = 2;
 	      break;
 	    case 1:
+	      dch = 0;
 	      //printf("led:%d\n\n\n\n",led_mod);
 	      ret =  comedi_dio_write(dev[0],2,1,0);
 	      if(ret < 0){
@@ -616,6 +625,7 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 	      }
 	      break;
 	    case 2:
+	      dch = 1;
 	      //printf("led:%d\n\n\n\n",led_mod);
 	      ret =  comedi_dio_write(dev[0],2,0,0);
 	      if(ret < 0){
@@ -641,15 +651,15 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 	    }
 	  }
 	  
-	  if (led_mod == 3){
+	  if (led_index == 3){
 	    // save data
 	    if (comediRecord->recPushButton->checkState()==Qt::Checked) {
 	      writeFile();
 	    }
 	    if (count==2*8000){
 	      count =0;
-	      static int diout = 0;
-	      switch (diout){
+	      //static int diout = 0;
+	      switch (dch){
 	      case 0:
 		ret = comedi_dio_write(dev[0],2,0,0);
 		if(ret < 0){
@@ -687,7 +697,7 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 		}
 		break;
 	      }
-	      diout = (diout+1)%3;
+	      dch = (dch+1)%3;
 	      ret  = read(comedi_fileno(dev[0]),fake_buffer,comedi_get_buffer_contents(dev[0],0));
 	      //printf("buffer read:%d\n",ret);
 	    } else {

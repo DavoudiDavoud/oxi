@@ -118,6 +118,10 @@ private:
      * elapsed msec
      **/
     long int         nsamples;
+    long int count;
+    int led_index;
+    int exp_index;
+    int dch;
 
 public:
     /**

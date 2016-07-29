@@ -22,6 +22,7 @@ class ComediRecord;
 #include "channel.h"
 #include "led.h"
 #include "axis.h"
+#include "exp.h"
 #include "dc_sub.h"
 #include "hp.h"
 #include "lp.h"
@@ -87,7 +88,10 @@ public:
  * AXIS label
  **/
     QLabel* axisLabel;
-
+/**
+* EXP label
+ **/
+    QLabel* expLabel;
 /**
  * channel label
  **/
@@ -137,7 +141,10 @@ public:
      * Array for the channel Axis combo settings
      **/
     Axis* axis;
-    
+    /**
+     * Array for the channel Exp combo settings
+     **/
+    Exp* exp;
 
     /**
      * Array for the gain settings
@@ -259,7 +266,11 @@ private:
  **/
     QGroupBox* axisgrp;
     QHBoxLayout* axisbox;
-
+/**
+ * Group which keeps Exp
+ **/
+    QGroupBox* expgrp;
+    QHBoxLayout* expbox;
 
 /**
  * Layout which keeps one channel together
